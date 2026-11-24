@@ -9,16 +9,49 @@ KS.sound = (function () {
   var an = true;
   try { an = localStorage.getItem('ks-ton') !== 'aus'; } catch (e) { /* egal */ }
 
-  function kontext() {
-    if (!an) return null;
+  // iOS 17+: Ton auch spielen, wenn der Stummschalter am iPhone an ist
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = 'playback';
+  } catch (e) { /* älteres iOS oder anderer Browser */ }
+
+  function erzeugeKontext() {
     if (!ctx) {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
       ctx = new AC();
     }
-    if (ctx.state === 'suspended') ctx.resume();
+    // iOS kennt neben 'suspended' auch 'interrupted' (z. B. nach App-Wechsel)
+    if (ctx.state !== 'running') ctx.resume();
     return ctx;
   }
+
+  function kontext() {
+    if (!an) return null;
+    return erzeugeKontext();
+  }
+
+  /*
+   * iOS gibt Ton erst frei, wenn er direkt in einer Berührung gestartet wird.
+   * Darum bei jeder Berührung: Kontext aufwecken und einen stillen Ton abspielen.
+   */
+  function freischalten() {
+    var ac = erzeugeKontext();
+    if (!ac) return;
+    try {
+      var buf = ac.createBuffer(1, 1, ac.sampleRate);
+      var src = ac.createBufferSource();
+      src.buffer = buf;
+      src.connect(ac.destination);
+      src.start(0);
+    } catch (e) { /* egal */ }
+  }
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, freischalten, { capture: true, passive: true });
+  });
+  // Nach dem Zurückkehren in die App wieder aufwecken
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume();
+  });
 
   // Einfacher Ton mit Hüllkurve; o = { typ, vol, bis (Zielfrequenz), start }
   function ton(freq, dauer, o) {

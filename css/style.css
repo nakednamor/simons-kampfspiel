@@ -105,12 +105,34 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
 .btn-zweit { background: linear-gradient(180deg, #c4b5fd, #8b5cf6); color: #fff; box-shadow: 0 5px 0 #5b21b6, 0 8px 20px #0006; }
 .btn-zweit:active:not(:disabled) { box-shadow: 0 1px 0 #5b21b6; }
 
-.ton-schalter {
+.ecke-knopf {
   position: fixed; top: calc(14px + var(--sicher-oben)); right: calc(14px + var(--sicher-rechts)); z-index: 50;
-  font-size: 1.4rem; width: 48px; height: 48px;
+  font-size: 1.4rem; width: 48px; height: 48px; padding: 0;
   border-radius: 50%; border: 2px solid #ffffff30;
   background: #0006; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
+.ecke-knopf[hidden] { display: none; }
+.start-knopf { right: calc(70px + var(--sicher-rechts)); }
+
+.dialog {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000a;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: einblenden 0.2s ease;
+}
+.dialog[hidden] { display: none; }
+.dialog-box {
+  background: var(--karte); border-radius: 20px; padding: 22px 22px 18px;
+  max-width: 420px; width: 100%; text-align: center;
+  box-shadow: inset 0 0 0 2px #ffffff20, 0 20px 50px #000a;
+}
+.dialog-box h2 { font-size: 1.6rem; color: var(--gold); }
+.dialog-box p { color: var(--text-leise); margin: 8px 0 18px; }
+.dialog-knoepfe { display: flex; flex-direction: column; gap: 12px; }
+
+.version { color: #ffffff40; font-size: 0.75rem; margin: 14px 0 0; }
 
 .runden-schild {
   display: inline-block;
@@ -420,6 +442,11 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
 
 .ton-hinweis { color: var(--text-leise); font-size: 0.9rem; margin: 14px 0 0; }
 
+/* PC-Fenster, in denen die Eck-Knöpfe über das Kampf-HUD ragen würden */
+@media (min-width: 821px) and (max-width: 1400px) and (min-height: 501px) {
+  #screen-kampf .hud { margin-top: 44px; }
+}
+
 /* ===================================================================
    Tablet / schmale Fenster
    =================================================================== */
@@ -431,7 +458,7 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
   .eingabe-figur { width: 180px; height: 240px; }
   .eingabe-rechts { width: 100%; }
   .hud { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .hud-mitte { grid-column: 1 / -1; order: -1; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 0; }
+  .hud-mitte { grid-column: 1 / -1; order: -1; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 0; min-height: 52px; }
   .schritt-punkte { margin-top: 0; }
   .arena { height: 320px; }
   .kaempfer { width: 190px; height: 285px; }
@@ -444,7 +471,8 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
 @media (max-width: 600px) {
   #app { padding: calc(10px + var(--sicher-oben)) calc(12px + var(--sicher-rechts)) calc(12px + var(--sicher-unten)) calc(12px + var(--sicher-links)); }
 
-  .ton-schalter { width: 38px; height: 38px; font-size: 1.1rem; top: calc(8px + var(--sicher-oben)); right: calc(8px + var(--sicher-rechts)); }
+  .ecke-knopf { width: 38px; height: 38px; font-size: 1.1rem; top: calc(8px + var(--sicher-oben)); right: calc(8px + var(--sicher-rechts)); }
+  .start-knopf { right: calc(52px + var(--sicher-rechts)); }
 
   .btn { font-size: 1.05rem; padding: 11px 20px; }
   .btn-gross { font-size: 1.25rem; padding: 13px 30px; }
@@ -469,7 +497,9 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
   .charakter-karte strong { font-size: 0.85rem; }
   .charakter-karte span { display: none; }
   .vs { font-size: 1.4rem; line-height: 1; }
-  .regeln { margin-top: 14px; padding: 10px 14px; font-size: 0.92rem; }
+  .regeln { margin-top: 10px; padding: 9px 14px; font-size: 0.92rem; }
+  .ton-hinweis { margin-top: 8px; font-size: 0.85rem; }
+  .version { margin-top: 6px; font-size: 0.7rem; }
   .regeln ul { padding-left: 18px; }
 
   /* --- Übergabe --- */
@@ -479,7 +509,7 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
   .wegschauen { font-size: 1.1rem; margin-bottom: 22px; }
 
   /* --- Eingabe --- */
-  .eingabe-kopf { gap: 10px; margin-bottom: 4px; padding-right: 44px; }
+  .eingabe-kopf { gap: 10px; margin-bottom: 4px; padding-right: 88px; }
   #eingabe-titel { font-size: 1.2rem; line-height: 1.15; }
   .eingabe-inhalt { gap: 6px; }
   .eingabe-figur { width: 120px; height: 160px; }
@@ -541,7 +571,8 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
    =================================================================== */
 @media (orientation: landscape) and (max-height: 500px) {
   #app { padding-top: calc(8px + var(--sicher-oben)); padding-bottom: calc(8px + var(--sicher-unten)); }
-  .ton-schalter { width: 36px; height: 36px; font-size: 1rem; top: calc(6px + var(--sicher-oben)); }
+  .ecke-knopf { width: 36px; height: 36px; font-size: 1rem; top: calc(6px + var(--sicher-oben)); }
+  .start-knopf { right: calc(58px + var(--sicher-rechts)); }
   .logo { font-size: 1.6rem; margin-bottom: 8px; }
   .btn-gross { font-size: 1.15rem; padding: 10px 28px; }
 
@@ -562,7 +593,7 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
   #uebergabe-name { font-size: 1.5rem; }
   .wegschauen { margin-bottom: 12px; }
 
-  .eingabe-kopf { margin-bottom: 8px; padding-right: 44px; }
+  .eingabe-kopf { margin-bottom: 8px; padding-right: 92px; }
   #eingabe-titel { font-size: 1.2rem; }
   .eingabe-inhalt { flex-direction: row; gap: 14px; }
   .eingabe-figur { width: 120px; height: 165px; }
@@ -571,7 +602,7 @@ h1, h2 { font-family: var(--schrift); font-weight: 400; letter-spacing: 0.03em; 
   .aktion-btn { padding: 8px 6px; font-size: 0.9rem; }
   .eingabe-info { margin: 6px 2px; }
 
-  .hud { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; padding-right: 40px; }
+  .hud { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; padding-right: 90px; }
   .hud-mitte { grid-column: auto; order: 0; display: block; }
   .schritt-punkte { margin-top: 8px; }
   .hud-name { font-size: 0.95rem; }

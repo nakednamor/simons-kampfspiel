@@ -4,6 +4,8 @@
  */
 var KS = (globalThis.KS = globalThis.KS || {});
 
+KS.version = '1.2';
+
 KS.config = {
   startEnergie: 100,
   aktionenProRunde: 5,

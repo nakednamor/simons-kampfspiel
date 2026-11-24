@@ -15,7 +15,21 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <button id="ton-schalter" class="ton-schalter" type="button" title="Ton an/aus">🔊</button>
+  <button id="ton-schalter" class="ecke-knopf ton-schalter" type="button" title="Ton an/aus">🔊</button>
+  <button id="start-knopf" class="ecke-knopf start-knopf" type="button" title="Zurück zum Start" hidden>🏠</button>
+
+  <!-- Rückfrage: Spiel abbrechen -->
+  <div id="dialog" class="dialog" hidden>
+    <div class="dialog-box">
+      <h2>Spiel abbrechen?</h2>
+      <p>Der aktuelle Kampf geht verloren.</p>
+      <div class="dialog-knoepfe">
+        <button id="dialog-nein" class="btn btn-zweit" type="button">Weiterspielen</button>
+        <button id="dialog-revanche" class="btn btn-zweit" type="button">🔁 Von vorn</button>
+        <button id="dialog-ja" class="btn" type="button">🏠 Zum Start</button>
+      </div>
+    </div>
+  </div>
 
   <main id="app">
 
@@ -41,6 +55,7 @@
         <summary>📜 Spielregeln</summary>
         <div id="regeln-text"></div>
       </details>
+      <p id="version" class="version"></p>
     </section>
 
     <!-- 2. Gerät übergeben -->

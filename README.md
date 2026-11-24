@@ -29,7 +29,9 @@ Alle Werte stehen in `js/config.js` und lassen sich dort anpassen.
 
 - **PC:** Maus. Beim Wählen nimmt `⌫` die letzte Aktion zurück, `Enter` heißt „fertig“. Fährt man mit der Maus über einen Button, zeigt die Figur die Pose.
 - **iPhone/Tablet:** Antippen. Ein Tipp auf ein gefülltes Feld entfernt diese Aktion. Das Handy wird zwischen den Spielern weitergereicht. Gespielt wird am besten im Hochformat.
-- Der Ton lässt sich mit dem Lautsprecher-Knopf rechts oben ein- und ausschalten. Am iPhone muss außerdem der Stummschalter aus sein.
+- Der Ton lässt sich mit dem Lautsprecher-Knopf rechts oben ein- und ausschalten. Ab iOS 17 spielt der Ton auch, wenn der Stummschalter am iPhone an ist. Bei älteren Versionen muss der Stummschalter aus sein.
+- Mit dem 🏠-Knopf rechts oben lässt sich jederzeit abbrechen: weiterspielen, von vorn beginnen (gleiche Spieler) oder zurück zum Start.
+- Die Versionsnummer steht unten am Startbildschirm. Nach einem Update die Home-Bildschirm-App ganz schließen (in der App-Übersicht nach oben wischen) und neu öffnen.
 
 ## Auf GitHub Pages veröffentlichen (fürs iPhone)
 

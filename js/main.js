@@ -17,11 +17,13 @@
     runde: 1,
     aktiv: 0,
     screen: 'screen-setup',
-    laeuft: false
+    laeuft: false,
+    durchlauf: 0      // wird beim Abbrechen erhöht → laufende Animationen stoppen
   };
 
   function zeigeScreen(id) {
     spiel.screen = id;
+    $('#start-knopf').hidden = (id === 'screen-setup');
     document.querySelectorAll('.screen').forEach(function (s) {
       s.classList.toggle('aktiv', s.id === id);
     });
@@ -101,6 +103,8 @@
       spiel.spieler[1].name += ' (2)';
     }
     spiel.runde = 1;
+    spiel.durchlauf++;
+    spiel.laeuft = false;
     S.bestaetigen();
     starteRunde();
   }
@@ -364,9 +368,12 @@
   }
 
   async function spieleRunde() {
+    var meinDurchlauf = spiel.durchlauf;
+    var abgebrochen = function () { return meinDurchlauf !== spiel.durchlauf; };
     spiel.laeuft = true;
     S.runde();
     await zeigeBanner('Runde ' + spiel.runde + ' – Kampf!', 1300);
+    if (abgebrochen()) return;
 
     var energien = [spiel.spieler[0].energie, spiel.spieler[1].energie];
     var ende = { vorbei: false, sieger: null };
@@ -380,6 +387,7 @@
       F.setzePose(figur(0), ids[0]);
       F.setzePose(figur(1), ids[1]);
       await warte(300);
+      if (abgebrochen()) return;
 
       var erg = R.werteAus(ids[0], ids[1]);
       zeigeWirkung(erg, ids);
@@ -390,23 +398,27 @@
       $('#kampf-text').textContent = beschreibe(erg, ids);
 
       await warte(C.schrittDauerMs * 0.55);
+      if (abgebrochen()) return;
       F.setzePose(figur(0), null);
       F.setzePose(figur(1), null);
 
       ende = R.pruefeEnde(energien);
       if (ende.vorbei) break;
       await warte(C.schrittDauerMs * 0.45);
+      if (abgebrochen()) return;
     }
     markiereSchritt(C.aktionenProRunde);
     spiel.laeuft = false;
 
     if (ende.vorbei) {
       await warte(400);
+      if (abgebrochen()) return;
       [0, 1].forEach(function (nr) {
         if (spiel.spieler[nr].energie <= 0) $('#kaempfer-' + nr).classList.add('ko');
       });
       S.ko();
       await zeigeBanner('K.O.!', 1600);
+      if (abgebrochen()) return;
       zeigeEnde(ende);
     } else {
       $('#btn-weiter').hidden = false;
@@ -446,6 +458,25 @@
     S.sieg();
   }
 
+  /* ---------- Abbrechen / Neustart ---------- */
+
+  function oeffneDialog() {
+    if (spiel.screen === 'screen-setup') return;
+    S.klick();
+    $('#dialog').hidden = false;
+  }
+
+  function schliesseDialog() {
+    $('#dialog').hidden = true;
+  }
+
+  function brichAb() {
+    spiel.durchlauf++;          // laufende Kampf-Animation stoppt beim nächsten Schritt
+    spiel.laeuft = false;
+    $('#banner').classList.remove('zeigen');
+    schliesseDialog();
+  }
+
   /* ---------- Start ---------- */
 
   function init() {
@@ -460,12 +491,23 @@
     $('#btn-revanche').addEventListener('click', starteSpiel);
     $('#btn-neu').addEventListener('click', function () { S.klick(); zeigeScreen('screen-setup'); });
 
+    $('#start-knopf').addEventListener('click', oeffneDialog);
+    $('#dialog-nein').addEventListener('click', function () { S.klick(); schliesseDialog(); });
+    $('#dialog-ja').addEventListener('click', function () { brichAb(); S.klick(); zeigeScreen('screen-setup'); });
+    $('#dialog-revanche').addEventListener('click', function () { brichAb(); starteSpiel(); });
+    $('#dialog').addEventListener('click', function (e) { if (e.target.id === 'dialog') schliesseDialog(); });
+    $('#version').textContent = 'Version ' + KS.version;
+
     var ton = $('#ton-schalter');
     ton.textContent = S.istAn() ? '🔊' : '🔇';
     ton.addEventListener('click', function () { ton.textContent = S.umschalten() ? '🔊' : '🔇'; });
 
     document.addEventListener('keydown', function (e) {
       if (e.repeat) return;
+      if (!$('#dialog').hidden) {
+        if (e.key === 'Escape') schliesseDialog();
+        return;
+      }
       var s = spiel.screen;
       if (s === 'screen-eingabe') {
         if (e.key === 'Backspace') { e.preventDefault(); entferneLetzte(); }
