@@ -1,0 +1,390 @@
+/* ===== Grundlagen ===== */
+:root {
+  --bg1: #1b1035;
+  --bg2: #0b0618;
+  --karte: #2a1d4d;
+  --karte-hell: #3b2a6b;
+  --text: #f8f5ff;
+  --text-leise: #b9addb;
+  --gold: #fbbf24;
+  --rot: #ef4444;
+  --gruen: #22c55e;
+  --hand: #f97316;
+  --fuss: #ec4899;
+  --block: #38bdf8;
+  --schrift: "Arial Black", "Segoe UI Black", Impact, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: radial-gradient(ellipse at top, var(--bg1), var(--bg2) 70%) fixed;
+  min-height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app { max-width: 1100px; margin: 0 auto; padding: 24px 20px 40px; }
+
+h1, h2 { font-family: var(--schrift); letter-spacing: 0.02em; margin: 0; }
+
+.screen { display: none; animation: einblenden 0.35s ease; }
+.screen.aktiv { display: block; }
+@keyframes einblenden { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.logo {
+  text-align: center;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  background: linear-gradient(180deg, #fde68a, #f59e0b 60%, #b45309);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 4px 0 #0008);
+  margin-bottom: 20px;
+}
+
+.gespiegelt .figur { transform: scaleX(-1); }
+
+/* ===== Buttons ===== */
+.btn {
+  font-family: var(--schrift);
+  font-size: 1.1rem;
+  color: #1b1035;
+  background: linear-gradient(180deg, #fde68a, var(--gold));
+  border: none;
+  border-radius: 14px;
+  padding: 12px 26px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #b45309, 0 8px 20px #0006;
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.15s;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 #b45309, 0 4px 10px #0006; }
+.btn:disabled { filter: grayscale(1) brightness(0.6); cursor: not-allowed; }
+.btn-gross { font-size: 1.4rem; padding: 16px 40px; }
+.btn-zweit { background: linear-gradient(180deg, #c4b5fd, #8b5cf6); color: #fff; box-shadow: 0 5px 0 #5b21b6, 0 8px 20px #0006; }
+.btn-zweit:active:not(:disabled) { box-shadow: 0 1px 0 #5b21b6; }
+
+.ton-schalter {
+  position: fixed; top: 14px; right: 14px; z-index: 50;
+  font-size: 1.4rem; width: 48px; height: 48px;
+  border-radius: 50%; border: 2px solid #ffffff30;
+  background: #0006; cursor: pointer;
+}
+
+.runden-schild {
+  display: inline-block;
+  font-family: var(--schrift);
+  background: var(--rot);
+  color: #fff;
+  padding: 4px 16px;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 #7f1d1d;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+/* ===== Setup ===== */
+#screen-setup { text-align: center; }
+.setup-spalten { display: flex; gap: 16px; align-items: stretch; justify-content: center; margin-bottom: 28px; }
+.spieler-setup {
+  flex: 1; max-width: 470px;
+  background: var(--karte);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: inset 0 0 0 2px #ffffff14, 0 10px 30px #0005;
+}
+.spieler-setup[data-spieler="0"] h2 { color: #fca5a5; }
+.spieler-setup[data-spieler="1"] h2 { color: #93c5fd; }
+.vs { align-self: center; font-family: var(--schrift); font-size: 2.4rem; color: var(--gold); text-shadow: 0 4px 0 #0008; }
+
+.name-feld {
+  width: 100%; margin: 12px 0 16px;
+  font-size: 1.2rem; font-weight: 700; text-align: center;
+  padding: 10px 14px; border-radius: 12px;
+  border: 2px solid #ffffff30; background: #0005; color: var(--text);
+  user-select: text; -webkit-user-select: text;
+}
+.name-feld:focus { outline: none; border-color: var(--gold); }
+
+.charakter-wahl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.charakter-karte {
+  background: var(--karte-hell);
+  border: 3px solid transparent;
+  border-radius: 16px;
+  padding: 8px 6px 10px;
+  color: var(--text);
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  transition: transform 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.charakter-karte:hover:not(:disabled) { transform: translateY(-3px); }
+.charakter-karte.gewaehlt { border-color: var(--gold); box-shadow: 0 0 18px #fbbf2466; }
+.charakter-karte.vergeben { opacity: 0.35; cursor: not-allowed; }
+.charakter-karte strong { font-family: var(--schrift); font-size: 0.95rem; }
+.charakter-karte span { font-size: 0.72rem; color: var(--text-leise); }
+.karte-figur { width: 100%; height: 130px; }
+.karte-figur .figur { width: 100%; height: 100%; }
+
+.regeln { max-width: 720px; margin: 28px auto 0; text-align: left; background: #0004; border-radius: 14px; padding: 12px 18px; }
+.regeln summary { cursor: pointer; font-weight: 700; }
+.regeln li { margin: 6px 0; color: var(--text-leise); }
+.regeln b { color: var(--text); }
+
+/* ===== Übergabe ===== */
+.uebergabe-box { text-align: center; padding-top: 30px; }
+.uebergabe-figur { width: 180px; height: 240px; margin: 20px auto 10px; }
+.uebergabe-figur .figur { width: 100%; height: 100%; }
+#uebergabe-name { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 8px; }
+.wegschauen { font-size: 1.3rem; color: var(--text-leise); margin: 0 0 30px; }
+
+/* ===== Eingabe ===== */
+.eingabe-kopf { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+#eingabe-titel { font-size: clamp(1.4rem, 3vw, 2rem); }
+.eingabe-inhalt { display: flex; gap: 24px; align-items: center; }
+.eingabe-figur { width: 260px; height: 360px; flex-shrink: 0; background: radial-gradient(circle at 50% 70%, #ffffff12, transparent 65%); border-radius: 20px; }
+.eingabe-figur .figur { width: 100%; height: 100%; }
+.eingabe-rechts { flex: 1; }
+
+.slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+.slot {
+  position: relative; height: 92px;
+  border-radius: 14px;
+  border: 3px dashed #ffffff30;
+  background: #0003;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.slot.naechster { border-color: var(--gold); animation: pulsieren 1s infinite alternate; }
+@keyframes pulsieren { to { box-shadow: 0 0 14px #fbbf2466; } }
+.slot.voll { border-style: solid; animation: reinploppen 0.2s ease; }
+@keyframes reinploppen { from { transform: scale(0.7); } to { transform: scale(1); } }
+.slot-nr { position: absolute; top: 4px; left: 8px; font-size: 0.75rem; color: var(--text-leise); font-weight: 700; }
+.slot .aktion-icon { font-size: 2rem; }
+.slot-hoehe { font-size: 0.8rem; font-weight: 700; }
+
+.aktion-hand { border-color: var(--hand) !important; background: #f9731622 !important; }
+.aktion-fuss { border-color: var(--fuss) !important; background: #ec489922 !important; }
+.aktion-block { border-color: var(--block) !important; background: #38bdf822 !important; }
+
+.aktions-raster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.aktion-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 10px;
+  border-radius: 16px;
+  border: 3px solid;
+  color: var(--text);
+  font-family: var(--schrift); font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.08s, filter 0.15s;
+}
+.aktion-btn:hover:not(:disabled) { filter: brightness(1.35); transform: translateY(-2px); }
+.aktion-btn:active:not(:disabled) { transform: scale(0.96); }
+.aktion-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.aktion-btn .aktion-icon { font-size: 1.7rem; }
+
+.eingabe-info { display: flex; justify-content: space-between; margin: 14px 2px; color: var(--text-leise); font-weight: 700; }
+#block-zaehler { color: var(--block); }
+.tasten-hinweis { font-size: 0.85rem; }
+.wackeln { animation: wackeln 0.35s; }
+@keyframes wackeln { 25% { transform: translateX(-6px); color: var(--rot); } 75% { transform: translateX(6px); color: var(--rot); } }
+.eingabe-knoepfe { display: flex; justify-content: flex-end; gap: 14px; }
+
+/* ===== Kampf ===== */
+.hud { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: start; }
+.hud-name { display: flex; justify-content: space-between; font-family: var(--schrift); font-size: 1.2rem; margin-bottom: 6px; }
+.hud-zahl { color: var(--gold); }
+.balken { position: relative; height: 24px; background: #0008; border-radius: 12px; overflow: hidden; border: 2px solid #ffffff30; }
+.balken-fuell, .balken-geist { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 10px; }
+.balken-geist { background: #fff; transition: width 0.6s ease 0.45s; }
+.balken-fuell { background: linear-gradient(180deg, #86efac, var(--gruen)); transition: width 0.25s ease, background 0.3s; }
+.balken-fuell.mittel { background: linear-gradient(180deg, #fde68a, #eab308); }
+.balken-fuell.niedrig { background: linear-gradient(180deg, #fca5a5, var(--rot)); animation: blinken 0.6s infinite alternate; }
+@keyframes blinken { to { filter: brightness(1.4); } }
+.hud-spieler.rechts .balken-fuell, .hud-spieler.rechts .balken-geist { left: auto; right: 0; }
+
+.aufdeck-reihe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+.aufdeck-karte {
+  height: 50px; border-radius: 10px;
+  background: repeating-linear-gradient(45deg, #3b2a6b, #3b2a6b 6px, #2a1d4d 6px, #2a1d4d 12px);
+  border: 2px solid #ffffff25;
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  font-family: var(--schrift); color: #ffffff50; font-size: 1.2rem;
+}
+.aufdeck-karte.offen { animation: umdrehen 0.3s ease; color: var(--text); }
+.aufdeck-karte .aktion-icon { font-size: 1.4rem; }
+.karte-hoehe { font-size: 0.9rem; }
+@keyframes umdrehen { from { transform: rotateY(90deg); } to { transform: rotateY(0); } }
+
+.hud-mitte { text-align: center; padding-top: 4px; }
+.schritt-punkte { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
+.schritt-punkte span { width: 12px; height: 12px; border-radius: 50%; background: #ffffff25; transition: background 0.2s, transform 0.2s; }
+.schritt-punkte span.fertig { background: var(--text-leise); }
+.schritt-punkte span.jetzt { background: var(--gold); transform: scale(1.4); }
+
+.arena {
+  position: relative;
+  height: 380px;
+  margin-top: 16px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, transparent 72%, #00000055 72%),
+    linear-gradient(180deg, #312e81 0%, #6d28d9 45%, #db2777 72%, #3b0764 72%, #1e1b4b 100%);
+  display: flex; justify-content: center; align-items: flex-end; gap: 10px;
+  box-shadow: inset 0 0 60px #0008;
+}
+.arena::before { /* Mond */
+  content: ""; position: absolute; top: 30px; left: 50%; width: 90px; height: 90px; margin-left: -45px;
+  border-radius: 50%; background: #fde68a; box-shadow: 0 0 60px #fde68a99; opacity: 0.85;
+}
+.kaempfer { position: relative; width: 240px; height: 340px; margin-bottom: 8px; z-index: 2; }
+.kaempfer .atmen { width: 100%; height: 100%; animation: atmen 1.6s ease-in-out infinite; }
+.kaempfer .figur-rahmen, .kaempfer .figur { width: 100%; height: 100%; }
+#kaempfer-1 .atmen { animation-delay: -0.8s; }
+@keyframes atmen { 50% { transform: translateY(4px); } }
+
+.kaempfer.getroffen .figur-rahmen { animation: getroffen 0.4s ease; }
+@keyframes getroffen {
+  0% { filter: none; transform: translateX(0); }
+  20% { filter: brightness(1.3) drop-shadow(0 0 14px #ef4444) drop-shadow(0 0 4px #ef4444); transform: translateX(-16px); }
+  50% { transform: translateX(8px); }
+  100% { filter: none; transform: translateX(0); }
+}
+.kaempfer.gespiegelt.getroffen .figur-rahmen { animation-name: getroffen-rechts; }
+@keyframes getroffen-rechts {
+  0% { filter: none; transform: translateX(0); }
+  20% { filter: brightness(1.3) drop-shadow(0 0 14px #ef4444) drop-shadow(0 0 4px #ef4444); transform: translateX(16px); }
+  50% { transform: translateX(-8px); }
+  100% { filter: none; transform: translateX(0); }
+}
+
+.kaempfer.ko .atmen { animation: none; }
+
+.funke {
+  position: absolute; left: 50%; top: 45%; z-index: 5;
+  font-size: 5rem; transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none;
+}
+.funke.zeigen { animation: funke 0.5s ease-out; }
+@keyframes funke {
+  0% { transform: translate(-50%, -50%) scale(0.2) rotate(-20deg); opacity: 1; }
+  60% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+.schwebe-text {
+  position: absolute; left: 50%; top: 10%; z-index: 6;
+  font-family: var(--schrift); font-size: 2.4rem;
+  transform: translateX(-50%);
+  text-shadow: 0 3px 0 #000, 0 0 12px #000;
+  animation: schweben 1.2s ease-out forwards;
+  pointer-events: none; white-space: nowrap;
+}
+.schwebe-text.schaden { color: #fecaca; }
+.schwebe-text.geblockt-text { color: #bae6fd; font-size: 1.6rem; top: 0; }
+@keyframes schweben {
+  0% { opacity: 0; transform: translate(-50%, 20px) scale(0.6); }
+  15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+}
+
+.banner {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--schrift); font-size: clamp(2.4rem, 6vw, 4.4rem);
+  color: var(--gold); text-shadow: 0 5px 0 #7c2d12, 0 0 30px #000;
+  background: #0007; opacity: 0; pointer-events: none;
+}
+.banner.zeigen { animation: banner 0.4s ease forwards; }
+@keyframes banner { from { opacity: 0; transform: scale(1.6); } to { opacity: 1; transform: scale(1); } }
+
+.kampf-unten { text-align: center; min-height: 110px; padding-top: 16px; }
+.kampf-text { font-size: 1.25rem; font-weight: 700; min-height: 1.6em; margin: 0 0 14px; }
+
+/* ===== Ende ===== */
+.ende-box { text-align: center; padding-top: 20px; }
+.ende-figuren { display: flex; justify-content: center; gap: 20px; }
+.ende-figur { width: 220px; height: 300px; animation: huepfen 0.7s ease-in-out infinite alternate; }
+.ende-figur .figur { width: 100%; height: 100%; }
+@keyframes huepfen { to { transform: translateY(-14px); } }
+#ende-titel { margin-top: 10px; }
+#ende-info { font-size: 1.2rem; color: var(--text-leise); margin-bottom: 28px; }
+.ende-knoepfe { display: flex; gap: 16px; justify-content: center; }
+
+/* ===== Figuren-Posen ===== */
+.figur .glied, .figur .koerper-gruppe {
+  transform-box: view-box;
+  transition: transform 0.18s ease-out;
+}
+.figur .arm { transform-origin: 100px 110px; }
+.figur .bein { transform-origin: 100px 185px; }
+.figur .koerper-gruppe { transform-origin: 100px 270px; }
+.figur .arm-hinten, .figur .bein-hinten { filter: brightness(0.7); }
+
+/* Grundhaltung (Deckung) */
+.figur .arm-vorne { transform: rotate(-55deg); }
+.figur .arm-hinten { transform: rotate(-35deg); }
+.figur .bein-vorne { transform: rotate(-14deg); }
+.figur .bein-hinten { transform: rotate(14deg); }
+
+/* Schlag */
+.figur.pose-HO .arm-vorne { transform: rotate(-108deg); }
+.figur.pose-HO .koerper-gruppe { transform: translateX(10px) rotate(4deg); }
+.figur.pose-HU .arm-vorne { transform: rotate(-68deg); }
+.figur.pose-HU .koerper-gruppe { transform: translateX(10px) translateY(10px) rotate(6deg); }
+.figur.pose-HO .arm-hinten, .figur.pose-HU .arm-hinten { transform: rotate(-20deg); }
+
+/* Tritt */
+.figur.pose-FO .bein-vorne { transform: rotate(-118deg); }
+.figur.pose-FO .koerper-gruppe { transform: rotate(-9deg); }
+.figur.pose-FU .bein-vorne { transform: rotate(-72deg); }
+.figur.pose-FU .koerper-gruppe { transform: rotate(-5deg); }
+.figur.pose-FO .arm-vorne, .figur.pose-FU .arm-vorne { transform: rotate(-30deg); }
+.figur.pose-FO .arm-hinten, .figur.pose-FU .arm-hinten { transform: rotate(40deg); }
+
+/* Block */
+.figur.pose-BO .arm-vorne { transform: rotate(-150deg); }
+.figur.pose-BO .arm-hinten { transform: rotate(-140deg); }
+.figur.pose-BU .arm-vorne { transform: rotate(-28deg); }
+.figur.pose-BU .arm-hinten { transform: rotate(-18deg); }
+.figur.pose-BU .koerper-gruppe { transform: translateY(14px); }
+.figur.pose-BU .bein-vorne { transform: rotate(-28deg); }
+.figur.pose-BU .bein-hinten { transform: rotate(26deg); }
+
+/* Jubel */
+.figur.pose-sieg .arm-vorne { transform: rotate(-125deg); }
+.figur.pose-sieg .arm-hinten { transform: rotate(125deg); }
+
+/* K.O. */
+.kaempfer.ko .figur .koerper-gruppe { transform: translate(-30px, 20px) rotate(-80deg); transition: transform 0.6s ease-in; }
+.kaempfer.ko .figur .schatten { opacity: 0.3; }
+
+/* Schild bei Blocks */
+.figur .schild { opacity: 0; transform-box: fill-box; transform-origin: center; transition: opacity 0.15s; }
+.figur.pose-BO .schild-oben, .figur.pose-BU .schild-unten { opacity: 0.7; }
+.figur.blockt.pose-BO .schild-oben, .figur.blockt.pose-BU .schild-unten { animation: schild 0.45s ease; }
+@keyframes schild {
+  0% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 0 #fff); }
+  40% { opacity: 1; transform: scale(1.35); filter: drop-shadow(0 0 12px #e0f2fe); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+
+/* Roboter-Details */
+.figur-robo .antenne { animation: antenne 1.2s infinite alternate; }
+@keyframes antenne { to { fill: #fff; } }
+
+/* ===== Kleinere Bildschirme ===== */
+@media (max-width: 820px) {
+  .setup-spalten { flex-direction: column; align-items: center; }
+  .spieler-setup { width: 100%; }
+  .eingabe-inhalt { flex-direction: column; }
+  .eingabe-figur { width: 160px; height: 220px; }
+  .aktion-btn { flex-direction: column; gap: 2px; font-size: 0.85rem; padding: 10px 4px; }
+  .tasten-hinweis { display: none; }
+  .hud { grid-template-columns: 1fr 1fr; }
+  .hud-mitte { grid-column: 1 / -1; order: -1; }
+  .arena { height: 280px; }
+  .kaempfer { width: 160px; height: 240px; }
+}

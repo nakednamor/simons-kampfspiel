@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kampf-Arena</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <button id="ton-schalter" class="ton-schalter" type="button" title="Ton an/aus">🔊</button>
+
+  <main id="app">
+
+    <!-- 1. Namen und Charaktere -->
+    <section id="screen-setup" class="screen aktiv">
+      <h1 class="logo">⚔️ Kampf-Arena ⚔️</h1>
+      <div class="setup-spalten">
+        <div class="spieler-setup" data-spieler="0">
+          <h2>Spieler 1</h2>
+          <input id="name-0" class="name-feld" type="text" maxlength="14" placeholder="Name eingeben" autocomplete="off">
+          <div class="charakter-wahl" data-spieler="0"></div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="spieler-setup" data-spieler="1">
+          <h2>Spieler 2</h2>
+          <input id="name-1" class="name-feld" type="text" maxlength="14" placeholder="Name eingeben" autocomplete="off">
+          <div class="charakter-wahl" data-spieler="1"></div>
+        </div>
+      </div>
+      <button id="btn-start" class="btn btn-gross" type="button">Kampf starten!</button>
+      <details class="regeln">
+        <summary>📜 Spielregeln</summary>
+        <div id="regeln-text"></div>
+      </details>
+    </section>
+
+    <!-- 2. Gerät übergeben -->
+    <section id="screen-uebergabe" class="screen">
+      <div class="uebergabe-box">
+        <div id="uebergabe-runde" class="runden-schild">Runde 1</div>
+        <div id="uebergabe-figur" class="uebergabe-figur"></div>
+        <h2 id="uebergabe-name">…</h2>
+        <p id="uebergabe-weg" class="wegschauen">…</p>
+        <button id="btn-bereit" class="btn btn-gross" type="button">Ich bin bereit</button>
+      </div>
+    </section>
+
+    <!-- 3. Geheime Eingabe -->
+    <section id="screen-eingabe" class="screen">
+      <div class="eingabe-kopf">
+        <span id="eingabe-runde" class="runden-schild">Runde 1</span>
+        <h2 id="eingabe-titel">…</h2>
+      </div>
+      <div class="eingabe-inhalt">
+        <div id="eingabe-figur" class="eingabe-figur"></div>
+        <div class="eingabe-rechts">
+          <div id="slots" class="slots"></div>
+          <div id="aktions-raster" class="aktions-raster"></div>
+          <div class="eingabe-info">
+            <span id="block-zaehler">Blocks: 0 / 3</span>
+            <span class="tasten-hinweis">⌫ = zurück · Enter = fertig</span>
+          </div>
+          <div class="eingabe-knoepfe">
+            <button id="btn-zurueck" class="btn btn-zweit" type="button">↩ Zurück</button>
+            <button id="btn-fertig" class="btn" type="button">✔ Fertig</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Kampf -->
+    <section id="screen-kampf" class="screen">
+      <div class="hud">
+        <div class="hud-spieler" data-spieler="0">
+          <div class="hud-name"><span id="hud-name-0"></span><span id="hud-zahl-0" class="hud-zahl">100</span></div>
+          <div class="balken"><div class="balken-geist" id="geist-0"></div><div class="balken-fuell" id="balken-0"></div></div>
+          <div class="aufdeck-reihe" id="karten-0"></div>
+        </div>
+        <div class="hud-mitte">
+          <div id="hud-runde" class="runden-schild">Runde 1</div>
+          <div id="schritt-punkte" class="schritt-punkte"></div>
+        </div>
+        <div class="hud-spieler rechts" data-spieler="1">
+          <div class="hud-name"><span id="hud-zahl-1" class="hud-zahl">100</span><span id="hud-name-1"></span></div>
+          <div class="balken"><div class="balken-geist" id="geist-1"></div><div class="balken-fuell" id="balken-1"></div></div>
+          <div class="aufdeck-reihe" id="karten-1"></div>
+        </div>
+      </div>
+
+      <div class="arena">
+        <div class="kaempfer" id="kaempfer-0"><div class="atmen"><div class="figur-rahmen"></div></div></div>
+        <div class="funke" id="funke">💥</div>
+        <div class="kaempfer gespiegelt" id="kaempfer-1"><div class="atmen"><div class="figur-rahmen"></div></div></div>
+        <div id="banner" class="banner"></div>
+      </div>
+
+      <div class="kampf-unten">
+        <p id="kampf-text" class="kampf-text"></p>
+        <button id="btn-weiter" class="btn" type="button" hidden>Nächste Runde ▶</button>
+      </div>
+    </section>
+
+    <!-- 5. Ende -->
+    <section id="screen-ende" class="screen">
+      <div class="ende-box">
+        <div id="ende-figuren" class="ende-figuren"></div>
+        <h1 id="ende-titel" class="logo">🏆</h1>
+        <p id="ende-info"></p>
+        <div class="ende-knoepfe">
+          <button id="btn-revanche" class="btn btn-gross" type="button">🔁 Revanche</button>
+          <button id="btn-neu" class="btn btn-zweit" type="button">Neues Spiel</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Reihenfolge wichtig: normale Skripte, damit das Spiel auch per Doppelklick (file://) läuft -->
+  <script src="js/config.js"></script>
+  <script src="js/regeln.js"></script>
+  <script src="js/figuren.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
