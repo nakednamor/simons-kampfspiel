@@ -2,8 +2,16 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1b1035">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kampf-Arena">
+  <meta name="format-detection" content="telephone=no">
   <title>Kampf-Arena</title>
+  <link rel="icon" type="image/png" href="img/icon-192.png">
+  <link rel="apple-touch-icon" href="img/icon-180.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,6 +36,7 @@
         </div>
       </div>
       <button id="btn-start" class="btn btn-gross" type="button">Kampf starten!</button>
+      <p class="ton-hinweis nur-touch">🔇 Kein Ton? Stummschalter am iPhone ausschalten.</p>
       <details class="regeln">
         <summary>📜 Spielregeln</summary>
         <div id="regeln-text"></div>
@@ -58,7 +67,8 @@
           <div id="aktions-raster" class="aktions-raster"></div>
           <div class="eingabe-info">
             <span id="block-zaehler">Blocks: 0 / 3</span>
-            <span class="tasten-hinweis">⌫ = zurück · Enter = fertig</span>
+            <span class="tasten-hinweis nur-maus">⌫ = zurück · Enter = fertig</span>
+            <span class="tasten-hinweis nur-touch">Feld antippen = entfernen</span>
           </div>
           <div class="eingabe-knoepfe">
             <button id="btn-zurueck" class="btn btn-zweit" type="button">↩ Zurück</button>

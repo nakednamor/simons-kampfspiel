@@ -138,15 +138,26 @@
         b.innerHTML = '<span class="aktion-icon">' + akt.icon + '</span>' +
           '<span class="aktion-name">' + akt.name + '</span>';
         b.addEventListener('click', function () { fuegeAktionHinzu(id); });
-        b.addEventListener('mouseenter', function () { zeigeVorschau(id); });
-        b.addEventListener('mouseleave', function () { zeigeVorschau(null); });
+        // Vorschau beim Drüberfahren – nur mit Maus, nicht bei Touch
+        b.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hoverId = id; zeigeVorschau(id); } });
+        b.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hoverId = null; zeigeVorschau(null); } });
         raster.appendChild(b);
       });
     });
   }
 
+  var hoverId = null;
+  var vorschauTimer = null;
+
   function zeigeVorschau(id) {
+    clearTimeout(vorschauTimer);
     F.setzePose($('#eingabe-figur svg'), id);
+  }
+
+  // Pose kurz zeigen (z. B. nach dem Antippen), danach zurück
+  function zeigeVorschauKurz(id) {
+    zeigeVorschau(id);
+    vorschauTimer = setTimeout(function () { F.setzePose($('#eingabe-figur svg'), hoverId); }, 650);
   }
 
   function zeigeEingabe() {
@@ -170,6 +181,7 @@
     }
     sp.aktionen.push(id);
     S.klick();
+    zeigeVorschauKurz(id);
     aktualisiereEingabe();
   }
 
@@ -181,13 +193,25 @@
     aktualisiereEingabe();
   }
 
+  function entferneAn(index) {
+    var sp = spiel.spieler[spiel.aktiv];
+    if (index >= sp.aktionen.length) return;
+    sp.aktionen.splice(index, 1);
+    S.klick();
+    aktualisiereEingabe();
+  }
+
   function aktualisiereEingabe() {
     var sp = spiel.spieler[spiel.aktiv];
     var slots = $('#slots');
     slots.innerHTML = '';
     for (var i = 0; i < C.aktionenProRunde; i++) {
-      var d = document.createElement('div');
+      var d = document.createElement('button');
+      d.type = 'button';
       var id = sp.aktionen[i];
+      d.disabled = !id;
+      d.title = id ? A[id].name + ' – antippen zum Entfernen' : '';
+      d.addEventListener('click', entferneAn.bind(null, i));
       d.className = 'slot' + (id ? ' voll aktion-' + A[id].art : '') + (i === sp.aktionen.length ? ' naechster' : '');
       d.innerHTML = '<span class="slot-nr">' + (i + 1) + '</span>' +
         (id ? '<span class="aktion-icon">' + A[id].icon + '</span><span class="slot-hoehe">' + hoeheText(A[id]) + '</span>' : '');
@@ -449,7 +473,11 @@
       } else if (s === 'screen-uebergabe' && e.key === 'Enter') {
         e.preventDefault(); S.klick(); zeigeEingabe();
       } else if (s === 'screen-setup' && e.key === 'Enter') {
-        e.preventDefault(); starteSpiel();
+        e.preventDefault();
+        // Enter im ersten Namensfeld springt zum zweiten, im zweiten schließt es die Tastatur
+        if (e.target.id === 'name-0') $('#name-1').focus();
+        else if (e.target.id === 'name-1') e.target.blur();
+        else starteSpiel();
       }
     });
   }

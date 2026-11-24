@@ -27,14 +27,31 @@ Alle Werte stehen in `js/config.js` und lassen sich dort anpassen.
 
 ## Steuerung
 
-Gespielt wird mit der Maus oder per Touch. Beim Wählen gilt: `⌫` nimmt die letzte Aktion zurück, `Enter` heißt „fertig“.
-Der Ton lässt sich mit dem Lautsprecher-Knopf rechts oben ein- und ausschalten.
+- **PC:** Maus. Beim Wählen nimmt `⌫` die letzte Aktion zurück, `Enter` heißt „fertig“. Fährt man mit der Maus über einen Button, zeigt die Figur die Pose.
+- **iPhone/Tablet:** Antippen. Ein Tipp auf ein gefülltes Feld entfernt diese Aktion. Das Handy wird zwischen den Spielern weitergereicht. Gespielt wird am besten im Hochformat.
+- Der Ton lässt sich mit dem Lautsprecher-Knopf rechts oben ein- und ausschalten. Am iPhone muss außerdem der Stummschalter aus sein.
+
+## Auf GitHub Pages veröffentlichen (fürs iPhone)
+
+1. Auf github.com ein neues, **leeres** Repository anlegen, z. B. `kampf-arena`, ohne README. Für GitHub Pages im Gratis-Account muss das Repo **öffentlich** sein.
+2. Im Projektordner:
+   ```
+   git remote add origin https://github.com/<dein-name>/kampf-arena.git
+   git push -u origin main
+   ```
+3. Auf GitHub unter **Settings → Pages** bei „Source“ „Deploy from a branch“ wählen, dann Branch `main` und Ordner `/ (root)`, und auf **Save** klicken.
+4. Nach ein bis zwei Minuten ist das Spiel unter `https://<dein-name>.github.io/kampf-arena/` erreichbar.
+5. Am iPhone die Adresse in Safari öffnen und über **Teilen → Zum Home-Bildschirm** ein App-Symbol anlegen. Das Spiel startet dann im Vollbild ohne Safari-Leiste.
+
+Spätere Änderungen werden einfach mit `git push` hochgeladen, die Seite aktualisiert sich danach von selbst.
 
 ## Projektstruktur
 
 ```
 index.html        Bildschirme (Setup, Übergabe, Eingabe, Kampf, Ende)
-css/style.css     Aussehen, Animationen, Posen der Figuren
+css/style.css     Aussehen, Animationen, Posen, Layouts für PC/iPhone hoch/quer
+fonts/            Schrift „Luckiest Guy“ (Apache-2.0, Lizenz liegt dabei)
+img/              App-Symbole für Home-Bildschirm und Browser-Tab
 js/config.js      Spielwerte, Aktionen, Charaktere
 js/regeln.js      Kampflogik (ohne Darstellung)
 js/figuren.js     Kämpfer als SVG
